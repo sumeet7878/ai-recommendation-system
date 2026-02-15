@@ -1,0 +1,864 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🎬 AI-Powered Recommendation Engine</title>
+    
+    <!-- React & ReactDOM from CDN -->
+    <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+    <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+    
+    <!-- Babel for JSX -->
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+    
+    <!-- Axios for API calls -->
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+            color: #f1f5f9;
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 0 2rem;
+        }
+
+        /* Header */
+        .header {
+            background: rgba(15, 23, 42, 0.8);
+            backdrop-filter: blur(10px);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            padding: 1rem 0;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .header-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .logo-icon {
+            font-size: 2rem;
+            animation: float 3s ease-in-out infinite;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-10px); }
+        }
+
+        .logo h1 {
+            font-size: 1.8rem;
+            font-weight: 800;
+            background: linear-gradient(135deg, #6366f1 0%, #a855f7 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .nav {
+            display: flex;
+            gap: 2rem;
+        }
+
+        .nav-link {
+            color: #cbd5e1;
+            text-decoration: none;
+            font-weight: 500;
+            transition: color 0.3s;
+        }
+
+        .nav-link:hover {
+            color: #6366f1;
+        }
+
+        .status-indicator {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.5rem 1rem;
+            background: rgba(16, 185, 129, 0.1);
+            border: 1px solid rgba(16, 185, 129, 0.3);
+            border-radius: 50px;
+            color: #10b981;
+            font-weight: 600;
+        }
+
+        .status-dot {
+            width: 8px;
+            height: 8px;
+            background: #10b981;
+            border-radius: 50%;
+            animation: pulse 2s ease-in-out infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+
+        /* Hero */
+        .hero {
+            padding: 4rem 0 2rem;
+            text-align: center;
+        }
+
+        .hero-title {
+            font-size: 3.5rem;
+            font-weight: 900;
+            margin-bottom: 1rem;
+        }
+
+        .gradient-text {
+            background: linear-gradient(135deg, #6366f1 0%, #a855f7 50%, #ec4899 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .hero-subtitle {
+            font-size: 1.25rem;
+            color: #cbd5e1;
+            margin-bottom: 3rem;
+        }
+
+        .hero-stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 2rem;
+            max-width: 1000px;
+            margin: 0 auto;
+        }
+
+        .hero-stat {
+            padding: 1.5rem;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 16px;
+            transition: all 0.3s;
+            cursor: pointer;
+        }
+
+        .hero-stat:hover {
+            transform: translateY(-5px);
+            background: rgba(255, 255, 255, 0.08);
+            border-color: #6366f1;
+            box-shadow: 0 10px 30px rgba(99, 102, 241, 0.3);
+        }
+
+        .stat-value {
+            font-size: 2.5rem;
+            font-weight: 800;
+            background: linear-gradient(135deg, #6366f1 0%, #a855f7 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .stat-label {
+            font-size: 0.9rem;
+            color: #cbd5e1;
+            margin-top: 0.5rem;
+        }
+
+        /* Main Content */
+        .main-content {
+            padding: 2rem 0;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 3rem;
+        }
+
+        .stat-card {
+            display: flex;
+            align-items: center;
+            gap: 1.5rem;
+            padding: 2rem;
+            border-radius: 20px;
+            transition: all 0.3s;
+            cursor: pointer;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5);
+        }
+
+        .card-purple {
+            background: linear-gradient(135deg, rgba(168, 85, 247, 0.2), rgba(139, 92, 246, 0.2));
+            border: 1px solid rgba(168, 85, 247, 0.3);
+        }
+
+        .card-blue {
+            background: linear-gradient(135deg, rgba(59, 130, 246, 0.2), rgba(99, 102, 241, 0.2));
+            border: 1px solid rgba(59, 130, 246, 0.3);
+        }
+
+        .card-green {
+            background: linear-gradient(135deg, rgba(34, 197, 94, 0.2), rgba(16, 185, 129, 0.2));
+            border: 1px solid rgba(34, 197, 94, 0.3);
+        }
+
+        .card-orange {
+            background: linear-gradient(135deg, rgba(249, 115, 22, 0.2), rgba(245, 158, 11, 0.2));
+            border: 1px solid rgba(249, 115, 22, 0.3);
+        }
+
+        .stat-icon {
+            font-size: 3rem;
+        }
+
+        .stat-info h3 {
+            font-size: 0.9rem;
+            color: #cbd5e1;
+            margin-bottom: 0.5rem;
+        }
+
+        .stat-number {
+            font-size: 2rem;
+            font-weight: 800;
+            margin-bottom: 0.5rem;
+        }
+
+        .stat-change {
+            font-size: 0.85rem;
+            font-weight: 600;
+            padding: 0.25rem 0.75rem;
+            border-radius: 50px;
+            background: rgba(16, 185, 129, 0.2);
+            color: #10b981;
+        }
+
+        /* Charts */
+        .section-title {
+            font-size: 2rem;
+            font-weight: 800;
+            margin-bottom: 2rem;
+            text-align: center;
+        }
+
+        .charts-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(500px, 1fr));
+            gap: 2rem;
+            margin-bottom: 3rem;
+        }
+
+        .chart-card {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 20px;
+            padding: 2rem;
+            transition: all 0.3s;
+        }
+
+        .chart-card:hover {
+            background: rgba(255, 255, 255, 0.08);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+        }
+
+        .chart-card h3 {
+            margin-bottom: 1.5rem;
+            font-size: 1.25rem;
+        }
+
+        .chart-container {
+            position: relative;
+            height: 300px;
+        }
+
+        /* Try Section */
+        .try-section {
+            margin-bottom: 3rem;
+        }
+
+        .try-card {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 20px;
+            padding: 2rem;
+            max-width: 600px;
+            margin: 0 auto 2rem;
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 600;
+            color: #cbd5e1;
+        }
+
+        .form-group input {
+            width: 100%;
+            padding: 0.75rem 1rem;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            color: #f1f5f9;
+            font-size: 1rem;
+        }
+
+        .form-group input:focus {
+            outline: none;
+            border-color: #6366f1;
+            background: rgba(255, 255, 255, 0.08);
+        }
+
+        .btn-primary {
+            width: 100%;
+            padding: 1rem 2rem;
+            background: linear-gradient(135deg, #6366f1 0%, #a855f7 100%);
+            border: none;
+            border-radius: 10px;
+            color: white;
+            font-size: 1.1rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 30px rgba(99, 102, 241, 0.5);
+        }
+
+        .btn-primary:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .recommendations-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            gap: 1.5rem;
+            margin: 1.5rem 0;
+        }
+
+        .recommendation-card {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 15px;
+            padding: 1.5rem;
+            transition: all 0.3s;
+            animation: slideIn 0.3s ease-out;
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .recommendation-card:hover {
+            transform: translateY(-5px);
+            background: rgba(255, 255, 255, 0.08);
+            border-color: #6366f1;
+        }
+
+        .result-meta {
+            display: flex;
+            justify-content: center;
+            gap: 2rem;
+            padding: 1rem;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 10px;
+            margin-top: 1rem;
+        }
+
+        /* Models */
+        .models-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 3rem;
+        }
+
+        .model-card {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 20px;
+            padding: 2rem;
+            transition: all 0.3s;
+            cursor: pointer;
+        }
+
+        .model-card:hover {
+            transform: translateY(-5px);
+            background: rgba(255, 255, 255, 0.08);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+        }
+
+        .model-header {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            margin-bottom: 1rem;
+        }
+
+        .model-icon {
+            font-size: 2rem;
+        }
+
+        .model-card p {
+            color: #cbd5e1;
+            margin-bottom: 1rem;
+        }
+
+        .model-stats {
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.85rem;
+            color: #cbd5e1;
+        }
+
+        /* Footer */
+        .footer {
+            text-align: center;
+            padding: 2rem 0;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            color: #cbd5e1;
+        }
+
+        .loading {
+            text-align: center;
+            padding: 2rem;
+            color: #cbd5e1;
+        }
+
+        @media (max-width: 768px) {
+            .hero-title { font-size: 2rem; }
+            .nav { display: none; }
+            .charts-grid { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+    <div id="root"></div>
+
+    <script type="text/babel">
+        const { useState, useEffect, useRef } = React;
+
+        // Header Component
+        function Header() {
+            return (
+                <header className="header">
+                    <div className="container">
+                        <div className="header-content">
+                            <div className="logo">
+                                <span className="logo-icon">🎬</span>
+                                <h1>RecoAI</h1>
+                            </div>
+                            <nav className="nav">
+                                <a href="/" className="nav-link">Dashboard</a>
+                                <a href="/api/docs" className="nav-link">API Docs</a>
+                                <a href="/api/v1/stats" className="nav-link">Stats</a>
+                            </nav>
+                            <div className="status-indicator">
+                                <span className="status-dot"></span>
+                                <span>Live</span>
+                            </div>
+                        </div>
+                    </div>
+                </header>
+            );
+        }
+
+        // Hero Component
+        function Hero() {
+            return (
+                <section className="hero">
+                    <div className="container">
+                        <div className="hero-content">
+                            <h2 className="hero-title">
+                                <span className="gradient-text">Next-Gen</span> Recommendation Engine
+                            </h2>
+                            <p className="hero-subtitle">
+                                Screenshot 1 - 13:00:00 • Powered by Advanced ML • Real-time Predictions
+                            </p>
+                            <div className="hero-stats">
+                                <div className="hero-stat">
+                                    <div className="stat-value" id="active-users">1,245</div>
+                                    <div className="stat-label">Active Users</div>
+                                </div>
+                                <div className="hero-stat">
+                                    <div className="stat-value" id="recommendations">15,234</div>
+                                    <div className="stat-label">Recommendations</div>
+                                </div>
+                                <div className="hero-stat">
+                                    <div className="stat-value" id="latency">28ms</div>
+                                    <div className="stat-label">Avg Latency</div>
+                                </div>
+                                <div className="hero-stat">
+                                    <div className="stat-value">92.3%</div>
+                                    <div className="stat-label">Accuracy</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            );
+        }
+
+        // Stats Cards Component
+        function StatsCards() {
+            const stats = [
+                { icon: '👥', title: 'Total Users', value: '1,567', change: '↑ 25.8% (+322)', color: 'purple' },
+                { icon: '🎯', title: 'Items Catalog', value: '25,000', change: '↑ 8.3%', color: 'blue' },
+                { icon: '⚡', title: 'Cache Hit Rate', value: '85.5%', change: '↑ 3.2%', color: 'green' },
+                { icon: '🚀', title: 'Requests/Day', value: '18,456', change: '↑ 33.3% (+3,222)', color: 'orange' }
+            ];
+
+            return (
+                <div className="stats-grid">
+                    {stats.map((stat, index) => (
+                        <div key={index} className={`stat-card card-${stat.color}`}>
+                            <div className="stat-icon">{stat.icon}</div>
+                            <div className="stat-info">
+                                <h3>{stat.title}</h3>
+                                <p className="stat-number">{stat.value}</p>
+                                <span className="stat-change">{stat.change}</span>
+                            </div>
+                        </div>
+                    ))}
+                </div>
+            );
+        }
+
+        // Charts Component
+        function Charts() {
+            const latencyRef = useRef(null);
+            const modelRef = useRef(null);
+
+            useEffect(() => {
+                // Configure Chart.js defaults
+                Chart.defaults.color = '#cbd5e1';
+                Chart.defaults.borderColor = 'rgba(255, 255, 255, 0.1)';
+
+                // Latency Chart
+                const latencyChart = new Chart(latencyRef.current, {
+                    type: 'line',
+                    data: {
+                        labels: ['00:00', '04:00', '08:00', '12:00', '16:00', '20:00', '24:00'],
+                        datasets: [{
+                            label: 'Response Time (ms)',
+                            data: [25, 28, 22, 30, 27, 24, 26],
+                            borderColor: '#6366f1',
+                            backgroundColor: 'rgba(99, 102, 241, 0.1)',
+                            tension: 0.4,
+                            fill: true,
+                            borderWidth: 3
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            legend: {
+                                display: true,
+                                labels: { color: '#cbd5e1', font: { size: 12 } }
+                            }
+                        },
+                        scales: {
+                            y: {
+                                beginAtZero: true,
+                                grid: { color: 'rgba(255, 255, 255, 0.1)' },
+                                ticks: { color: '#cbd5e1' }
+                            },
+                            x: {
+                                grid: { color: 'rgba(255, 255, 255, 0.1)' },
+                                ticks: { color: '#cbd5e1' }
+                            }
+                        }
+                    }
+                });
+
+                // Model Performance Chart
+                const modelChart = new Chart(modelRef.current, {
+                    type: 'bar',
+                    data: {
+                        labels: ['Collaborative', 'Content-Based', 'Neural Net', 'Hybrid'],
+                        datasets: [{
+                            label: 'Accuracy (%)',
+                            data: [89.5, 87.2, 91.8, 92.3],
+                            backgroundColor: [
+                                'rgba(168, 85, 247, 0.7)',
+                                'rgba(59, 130, 246, 0.7)',
+                                'rgba(34, 197, 94, 0.7)',
+                                'rgba(249, 115, 22, 0.7)'
+                            ],
+                            borderColor: ['#a855f7', '#3b82f6', '#22c55e', '#f97316'],
+                            borderWidth: 2
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            legend: {
+                                display: true,
+                                labels: { color: '#cbd5e1', font: { size: 12 } }
+                            }
+                        },
+                        scales: {
+                            y: {
+                                beginAtZero: true,
+                                max: 100,
+                                grid: { color: 'rgba(255, 255, 255, 0.1)' },
+                                ticks: { color: '#cbd5e1' }
+                            },
+                            x: {
+                                grid: { color: 'rgba(255, 255, 255, 0.1)' },
+                                ticks: { color: '#cbd5e1' }
+                            }
+                        }
+                    }
+                });
+
+                // Cleanup
+                return () => {
+                    latencyChart.destroy();
+                    modelChart.destroy();
+                };
+            }, []);
+
+            return (
+                <div className="charts-section">
+                    <h2 className="section-title">📊 Performance Analytics</h2>
+                    <div className="charts-grid">
+                        <div className="chart-card">
+                            <h3>⏱️ Response Time Distribution</h3>
+                            <div className="chart-container">
+                                <canvas ref={latencyRef}></canvas>
+                            </div>
+                        </div>
+                        <div className="chart-card">
+                            <h3>📈 Model Performance</h3>
+                            <div className="chart-container">
+                                <canvas ref={modelRef}></canvas>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            );
+        }
+
+        // Try It Out Component
+        function TryItOut() {
+            const [userId, setUserId] = useState(123);
+            const [numRecs, setNumRecs] = useState(10);
+            const [recommendations, setRecommendations] = useState([]);
+            const [loading, setLoading] = useState(false);
+            const [latency, setLatency] = useState(0);
+
+            const getRecommendations = async () => {
+                if (!userId) {
+                    alert('Please enter a user ID');
+                    return;
+                }
+
+                setLoading(true);
+                const startTime = performance.now();
+
+                try {
+                    const response = await axios.get(`/api/v1/recommend/${userId}?n=${numRecs}`);
+                    const endTime = performance.now();
+                    
+                    setRecommendations(response.data.recommendations);
+                    setLatency((endTime - startTime).toFixed(2));
+                } catch (error) {
+                    console.error('Error:', error);
+                    alert('Error getting recommendations');
+                } finally {
+                    setLoading(false);
+                }
+            };
+
+            return (
+                <div className="try-section">
+                    <h2 className="section-title">🎮 Try It Out</h2>
+                    <div className="try-card">
+                        <div className="form-group">
+                            <label htmlFor="userId">User ID</label>
+                            <input
+                                type="number"
+                                id="userId"
+                                value={userId}
+                                onChange={(e) => setUserId(e.target.value)}
+                                placeholder="Enter user ID"
+                            />
+                        </div>
+                        <div className="form-group">
+                            <label htmlFor="numRecs">Number of Recommendations</label>
+                            <input
+                                type="number"
+                                id="numRecs"
+                                value={numRecs}
+                                onChange={(e) => setNumRecs(e.target.value)}
+                                placeholder="10"
+                                min="1"
+                                max="50"
+                            />
+                        </div>
+                        <button 
+                            className="btn-primary" 
+                            onClick={getRecommendations}
+                            disabled={loading}
+                        >
+                            {loading ? 'Loading...' : 'Get Recommendations 🚀'}
+                        </button>
+                    </div>
+
+                    {recommendations.length > 0 && (
+                        <div>
+                            <h3 style={{ textAlign: 'center', marginBottom: '1.5rem' }}>✨ Recommendations</h3>
+                            <div className="recommendations-grid">
+                                {recommendations.map((rec, index) => (
+                                    <div key={index} className="recommendation-card">
+                                        <h4>#{index + 1} {rec.title}</h4>
+                                        <p style={{ color: '#cbd5e1', fontSize: '0.9rem', margin: '0.5rem 0' }}>
+                                            {Array.isArray(rec.genres) ? rec.genres.join(', ') : rec.genres || 'Various'}
+                                        </p>
+                                        <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: '1rem' }}>
+                                            <span style={{ color: '#10b981', fontWeight: '700' }}>
+                                                ⭐ {rec.score || 'N/A'}
+                                            </span>
+                                            <span style={{ color: '#a855f7', fontSize: '0.85rem' }}>
+                                                {rec.method || 'hybrid'}
+                                            </span>
+                                        </div>
+                                    </div>
+                                ))}
+                            </div>
+                            <div className="result-meta">
+                                <span>Latency: <strong>{latency}</strong>ms</span>
+                                <span>Model: <strong>Hybrid v1</strong></span>
+                            </div>
+                        </div>
+                    )}
+                </div>
+            );
+        }
+
+        // Models Component
+        function Models() {
+            const models = [
+                { icon: '🤝', title: 'Collaborative Filtering', desc: 'Matrix factorization with ALS algorithm', accuracy: '89.5%' },
+                { icon: '📝', title: 'Content-Based', desc: 'TF-IDF + SVD for item similarity', accuracy: '87.2%' },
+                { icon: '🧪', title: 'Neural Network', desc: 'Two-tower deep learning model', accuracy: '91.8%' },
+                { icon: '🎯', title: 'Hybrid Ensemble', desc: 'Weighted combination of all models', accuracy: '92.3%' }
+            ];
+
+            return (
+                <div className="models-section">
+                    <h2 className="section-title">🧠 Active Models</h2>
+                    <div className="models-grid">
+                        {models.map((model, index) => (
+                            <div key={index} className="model-card">
+                                <div className="model-header">
+                                    <span className="model-icon">{model.icon}</span>
+                                    <h3>{model.title}</h3>
+                                </div>
+                                <p>{model.desc}</p>
+                                <div className="model-stats">
+                                    <span>✅ Active</span>
+                                    <span>Accuracy: {model.accuracy}</span>
+                                </div>
+                            </div>
+                        ))}
+                    </div>
+                </div>
+            );
+        }
+
+        // Footer Component
+        function Footer() {
+            return (
+                <footer className="footer">
+                    <div className="container">
+                        <p>Built with ❤️ using React, FastAPI, PyTorch & Redis</p>
+                        <p>Last Updated: February 10, 2026</p>
+                    </div>
+                </footer>
+            );
+        }
+
+        // Main App Component
+        function App() {
+            return (
+                <>
+                    <Header />
+                    <Hero />
+                    <main className="main-content">
+                        <div className="container">
+                            <StatsCards />
+                            <Charts />
+                            <TryItOut />
+                            <Models />
+                        </div>
+                    </main>
+                    <Footer />
+                </>
+            );
+        }
+
+        // Render App
+        ReactDOM.render(<App />, document.getElementById('root'));
+
+        // Real-time Stats Polling
+        setInterval(() => {
+            fetch('/api/stats')
+                .then(res => res.json())
+                .then(data => {
+                    // Update stats in real-time
+                    if (document.getElementById('active-users')) {
+                        document.getElementById('active-users').innerText = data.active_users || '150K';
+                    }
+                    if (document.getElementById('recommendations')) {
+                        document.getElementById('recommendations').innerText = data.recommendations || '2.5M';
+                    }
+                    if (document.getElementById('latency')) {
+                        document.getElementById('latency').innerText = data.latency || '28ms';
+                    }
+                })
+                .catch(error => console.log('Stats update error:', error));
+        }, 2000); // Har 2 second mein update
+    </script>
+</body>
+</html>

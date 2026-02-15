@@ -1,0 +1,49 @@
+# Application Configuration
+app:
+  name: "AI-Powered Recommendation Engine"
+  version: "1.0.0"
+  description: "Advanced ML-powered recommendation system"
+  
+# Model Parameters
+models:
+  collaborative_filtering:
+    factors: 100
+    regularization: 0.01
+    iterations: 15
+    alpha: 40
+    
+  content_based:
+    n_components: 50
+    similarity_metric: "cosine"
+    
+  neural_network:
+    embedding_dim: 64
+    hidden_layers: [128, 64, 32]
+    dropout: 0.3
+    learning_rate: 0.001
+    epochs: 50
+    
+  hybrid:
+    cf_weight: 0.6
+    content_weight: 0.3
+    neural_weight: 0.1
+
+# Recommendations
+recommendations:
+  default_count: 10
+  max_count: 50
+  min_score: 0.3
+  diversity_weight: 0.2
+  
+# Performance
+performance:
+  batch_size: 256
+  cache_ttl: 3600
+  max_workers: 4
+  request_timeout: 50
+  
+# Metrics
+metrics:
+  precision_k: [5, 10, 20]
+  recall_k: [5, 10, 20]
+  ndcg_k: [5, 10, 20]
